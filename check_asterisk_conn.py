@@ -16,7 +16,7 @@ def check_reg():
 
 	if len(count) == 0:
 		print ("CRITICAL: No registered connection found!")
-		sys.exit(0)
+		sys.exit(2)
 	elif len(count) < 10:
 		print ("WARNING: %s Registered connections found, less than 10!" % len(count))
 		sys.exit(1)
