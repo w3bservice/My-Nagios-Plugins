@@ -1,9 +1,11 @@
 #!/usr/bin/python
+# Simple script to check some of asterisk connections
+# Jack Su - INFRA-614
 
 import sys,os,getopt
 
 def usage():
-    print """Usage: check_asterisk_conn.py [-h|--help] [-c|--check Registered|Non-Registered|Non-Registered-IAX2]"""
+    print """Usage: check_asterisk_conn.py [-h|--help] [-c|--check Registered|Unregistered|Unregistered-IAX2]"""
 
 def check_reg():
 	count = []
@@ -23,23 +25,31 @@ def check_reg():
 		sys.exit(0)
 
 def check_non_reg():
-	result = os.system('sudo /usr/sbin/asterisk -rx "sip show registry" | grep -v ^Host | grep -v "\d* SIP registrations." | grep -v " Registered "')
+	count = []
+	result = os.popen('sudo /usr/sbin/asterisk -rx "sip show registry" | grep -v ^Host | grep -v "\d* SIP registrations." | grep -v " Registered "')
+	res = result.read()
+	for line in res.splitlines():
+		count.append(line)
 
-	if result == 0:
-		print ("Error: Non-registered connection found!")
+	if len(count) != 0:
+		print ("Error: %s Unregistered connection found!" % len(count))
 		sys.exit(1)
 	else:
-		print ("OK: No non-registered connection found.")
+		print ("OK: No Unregistered connection found.")
 		sys.exit(0)
 
 def check_non_reg_iax2():
-	result = os.system('sudo /usr/sbin/asterisk -rx "iax2 show registry" | grep -v ^Host | grep -v "\d* IAX2 registrations." | grep -v " Registered "')
+	count = []
+	result = os.popen('sudo /usr/sbin/asterisk -rx "iax2 show registry" | grep -v ^Host | grep -v "\d* IAX2 registrations." | grep -v " Registered"')
+	res = result.read()
+	for line in res.splitlines():
+		count.append(line)
 
-	if result == 0:
-		print ("Error: Non-registered IAX2 connection found!")
+	if len(count) != 0:
+		print ("Error: %s Unregistered IAX2 connection found!" % len(count))
 		sys.exit(1)
 	else:
-		print ("OK: No non-registered IAX2 connection found.")
+		print ("OK: No Unregistered IAX2 connection found.")
 		sys.exit(0)
 
 short_args = "hc:"
@@ -58,9 +68,9 @@ for name, value in options:
 	if name in ("-c", "--check"):
 		if value == "Registered":
 			check_reg()
-		if value == "Non-Registered":
+		if value == "Unregistered":
 			check_non_reg()
-		if value == "Non-Registered-IAX2":
+		if value == "Unregistered-IAX2":
 			check_non_reg_iax2()
 		else:
 			usage()
