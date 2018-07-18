@@ -64,37 +64,42 @@ def check_non_reg_iax2():
 		print ("OK: No Unregistered IAX2 connection found.")
 		sys.exit(0)
 
-short_args = "hw:c:C:"
-long_args = ["help","check=","warning=","critical="]
+def main():
 
-try:
-    options, args = getopt.getopt(sys.argv[1:], short_args, long_args)
-except getopt.GetoptError:
-    usage()
-    sys.exit(3)
+	short_args = "hw:c:C:"
+	long_args = ["help","check=","warning=","critical="]
 
-warn_val = 0
-crit_val = 0
+	try:
+   		options, args = getopt.getopt(sys.argv[1:], short_args, long_args)
+	except getopt.GetoptError:
+    		usage()
+		sys.exit(3)
 
-for name, value in options:
-	if name in ("-h", "--help"):
-		usage()
-		sys.exit(0)
-	if name in ("-w", "--warning"):
-		warn_val = value
-	if name in ("-c", "--critical"):
-		crit_val = value
-	if name in ("-C", "--check"):
-		if value == "Registered":
-			check_reg(warn_val,crit_val)
-		if value == "Unregistered":
-			check_non_reg()
-		if value == "Unregistered-IAX2":
-			check_non_reg_iax2()
-		else:
+	warn_val = 0
+	crit_val = 0
+
+	for name, value in options:
+		if name in ("-h", "--help"):
 			usage()
-			sys.exit(3)
+			sys.exit(0)
+		if name in ("-w", "--warning"):
+			warn_val = value
+		if name in ("-c", "--critical"):
+			crit_val = value
+		if name in ("-C", "--check"):
+			if value == "Registered":
+				check_reg(warn_val,crit_val)
+			if value == "Unregistered":
+				check_non_reg()
+			if value == "Unregistered-IAX2":
+				check_non_reg_iax2()
+			else:
+				usage()
+				sys.exit(3)
 
-if len(sys.argv) == 1:
-	usage()
-	sys.exit(3)
+	if len(sys.argv) == 1:
+		usage()
+		sys.exit(3)
+
+if __name__ == "__main__":
+	main()
