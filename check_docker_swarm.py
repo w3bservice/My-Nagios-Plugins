@@ -1,9 +1,11 @@
 #!/usr/bin/python
+# check_docker_swarm.py - Check Docker Swarm Services
+# Jack Su - INFRA-674
 
-import os,sys,json,getopt,requests
+import sys,json,getopt,requests,socket
 
 def check_http_status(addr,obj):
-        result = requests.get(addr)
+	result = requests.get(addr)
 	chk_status = json.loads(result.text)
 	stat =  chk_status['status']
 	if stat not in ("ok","success"):
@@ -13,18 +15,31 @@ def check_http_status(addr,obj):
 		print ("OK: %s status is %s" % (obj,stat))
 		sys.exit(0)
 	
+def check_tcp_port(addr,port):
+	port = int(port)
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	result = sock.connect_ex((addr,port))
+	if result == 0:
+		print("%s port %d is open" % (addr,port))
+		sock.close()
+		sys.exit(0)
+	else:
+		print("%s port %d is not open" % (addr,port))
+		sock.close()
+		sys.exit(1)
+
 def usage():
-    print """Usage: check_docker_swarm.py [-h] [-C swarmdeploy|optuspaf|apigateway|wideband|symbiopaf|gnaf|source|optusb2b]"""
+    print """Usage: check_docker_swarm.py [-h] [-C swarmdeploy|optuspaf|apigateway|wideband|symbiopaf|gnaf|source|optusb2b|numown|memcache]"""
 
 
 def main():
 	allargs = "hC:"
 
 	try:
-            options, args = getopt.getopt(sys.argv[1:],allargs)
+		  options, args = getopt.getopt(sys.argv[1:],allargs)
 	except getopt.GetoptError:
-            usage()
-            sys.exit(3)
+			usage()
+			sys.exit(3)
 
 	for name, value in options:
 		if name == "-h":
@@ -63,6 +78,14 @@ def main():
 				chk_obj = value
 				chk_addr = "http://optusb2b.docker.overthewire.net.au/healthcheck/"
 				check_http_status(chk_addr,chk_obj)
+			if value == "numown":
+				chk_port = 8008
+				chk_addr = "numown.docker.otw.net.au"
+				check_tcp_port(chk_addr,chk_port)
+			if value == "memcache":
+				chk_port = 11211
+				chk_addr = "memcache.docker.otw.net.au"
+				check_tcp_port(chk_addr,chk_port)
 			else:
 				usage()
 				sys.exit(3)
