@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # check_docker_swarm.py - Check Docker Swarm Services
-# Jack Su - INFRA-674
+# Jack Su - INFRA-674|INFRA-682
 
-import sys,json,getopt,requests,socket
+import sys,json,getopt,requests,socket,memcache
 
 def check_http_status(addr,obj):
 	result = requests.get(addr)
@@ -28,12 +28,26 @@ def check_tcp_port(addr,port):
 		sock.close()
 		sys.exit(1)
 
+def check_memcache_key(memcached_server,key,value):
+	conn = memcache.Client([memcached_server])
+	result = conn.get(key)
+	chk_status = json.loads(result)
+	chk_key = chk_status['E164_number']
+	chk_value = chk_status['CAC']
+	if chk_value == value:
+		print ("OK: memcached query on specific key. E164_number: %s CAC: %s" % (chk_key,chk_value))
+		sys.exit(0)
+	else:
+		print ("Fail: memcached query on specific key is not match! E164_number: %s CAC: %s" % (chk_key,chk_value))
+		sys.exit(1)
+
 def usage():
-    print """Usage: check_docker_swarm.py [-h] [-C swarmdeploy|optuspaf|apigateway|wideband|symbiopaf|gnaf|source|optusb2b|numown|memcache]"""
+    print """Usage: check_docker_swarm.py [-h] [-k memcache_key] [-v memcache_value]\
+ [-C swarmdeploy|optuspaf|apigateway|wideband|symbiopaf|gnaf|source|optusb2b|numown|memcache]numown_memcache]"""
 
 
 def main():
-	allargs = "hC:"
+	allargs = "hk:v:C:"
 
 	try:
 		  options, args = getopt.getopt(sys.argv[1:],allargs)
@@ -45,6 +59,10 @@ def main():
 		if name == "-h":
 			usage()
 			sys.exit(0)
+		if name == "-k":
+			memcache_key = value
+		if name == "-v":
+			memcache_value = value
 		if name == "-C":
 			if value == "swarmdeploy":
 				chk_obj = value
@@ -86,6 +104,9 @@ def main():
 				chk_port = 11211
 				chk_addr = "memcache.docker.otw.net.au"
 				check_tcp_port(chk_addr,chk_port)
+			if value == "numown_memcache":
+				chk_addr = "numown.docker.otw.net.au:8008"
+				check_memcache_key(chk_addr,memcache_key,memcache_value)
 			else:
 				usage()
 				sys.exit(3)
