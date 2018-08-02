@@ -2,7 +2,7 @@
 # check_docker_swarm.py - Check Docker Swarm Services
 # Jack Su - INFRA-674|INFRA-682
 
-import sys,json,getopt,requests,socket,memcache
+import sys,json,getopt,requests,socket,memcache,re
 
 def check_http_status(addr,obj):
 	result = requests.get(addr)
@@ -20,26 +20,32 @@ def check_tcp_port(addr,port):
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	result = sock.connect_ex((addr,port))
 	if result == 0:
-		print("%s port %d is open" % (addr,port))
+		print("OK: %s port %d is open" % (addr,port))
 		sock.close()
 		sys.exit(0)
 	else:
-		print("%s port %d is not open" % (addr,port))
+		print("Warning: %s port %d is not open" % (addr,port))
 		sock.close()
 		sys.exit(1)
 
 def check_memcache_key(memcached_server,key,value):
-	conn = memcache.Client([memcached_server])
-	result = conn.get(key)
-	chk_status = json.loads(result)
-	chk_key = chk_status['E164_number']
-	chk_value = chk_status['CAC']
-	if chk_value == value:
-		print ("OK: memcached query on specific key. E164_number: %s CAC: %s" % (chk_key,chk_value))
-		sys.exit(0)
+	phone_num = re.compile('^0\d{9}$|^61\d{9}$')
+	res = re.search(phone_num, key)
+	if res:
+		conn = memcache.Client([memcached_server])
+		result = conn.get(key)
+		chk_status = json.loads(result)
+		chk_key = chk_status['E164_number']
+		chk_value = chk_status['CAC']
+		if chk_value == value:
+			print ("OK: memcached query on specific key. E164_number: %s CAC: %s" % (chk_key,chk_value))
+			sys.exit(0)
+		else:
+			print ("Fail: memcached query on specific key is not match! E164_number: %s CAC: %s" % (chk_key,chk_value))
+			sys.exit(1)
 	else:
-		print ("Fail: memcached query on specific key is not match! E164_number: %s CAC: %s" % (chk_key,chk_value))
-		sys.exit(1)
+		print ("Error: The mamcache_key you input %s is not a Australian phone number!" % key)
+		sys.exit(3)
 
 def usage():
     print """Usage: check_docker_swarm.py [-h] [-k memcache_key] [-v memcache_value]\
