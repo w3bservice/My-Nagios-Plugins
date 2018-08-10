@@ -11,10 +11,9 @@ def db_conn_test():
 	global config
 	try: 
 		cnn=mysql.connector.connect(**config) 
-		if cnn: 
+		if cnn.is_connected(): 
 			print "Database connection: OK" 
 			cnn.close()
-			return cnn
 	except mysql.connector.Error as e: 
 		print('Database connect fails!{}'.format(e))
 		sys.exit(3)
