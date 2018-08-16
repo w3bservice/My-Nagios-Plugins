@@ -34,15 +34,19 @@ def check_memcache_key(memcached_server,key,value):
 	if res:
 		conn = memcache.Client([memcached_server])
 		result = conn.get(key)
-		chk_status = json.loads(result)
-		chk_key = chk_status['E164_number']
-		chk_value = chk_status['CAC']
-		if chk_value == value:
-			print ("OK: memcached query on specific key. E164_number: %s CAC: %s" % (chk_key,chk_value))
-			sys.exit(0)
-		else:
-			print ("Fail: memcached query on specific key is not match! E164_number: %s CAC: %s" % (chk_key,chk_value))
+		if conn.stats == {}:
+			print ("Warning: %s connect failed!" % memcached_server)
 			sys.exit(1)
+		else:
+			chk_status = json.loads(result)
+			chk_key = chk_status['E164_number']
+			chk_value = chk_status['CAC']
+			if chk_value == value:
+				print ("OK: memcached query on specific key. E164_number: %s CAC: %s" % (chk_key,chk_value))
+				sys.exit(0)
+			else:
+				print ("Fail: memcached query on specific key is not match! E164_number: %s CAC: %s" % (chk_key,chk_value))
+				sys.exit(1)
 	else:
 		print ("Error: The mamcache_key you input %s is not a Australian phone number!" % key)
 		sys.exit(3)
