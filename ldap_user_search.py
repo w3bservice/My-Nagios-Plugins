@@ -62,7 +62,7 @@ def main():
 		if name in ("-h", "--help"):
 			usage()
 			sys.exit(0)
-		if name in ("-H", "--hostname"):
+		if name in ("-H", "--host"):
 			ldap_host = value
 		if name in ("-u", "--username"):
 			username = value
