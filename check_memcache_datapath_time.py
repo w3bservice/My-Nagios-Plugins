@@ -13,12 +13,11 @@ else:
 	datapath_timestamp = float(status[0][1]['datapath'])
 	datapath_time = datetime.datetime.fromtimestamp(datapath_timestamp)
 	chk_time = datetime.datetime.now() - datetime.timedelta(days=1)
-	exist_time = (datetime.datetime.now() - datapath_time)
-	run_time = (str(exist_time)).split(".")[0]
+	exist_time = (str(datetime.datetime.now() - datapath_time)).split(".")[0]
 
 	if chk_time < datapath_time:
-		print "OK: datapath time is %s" % run_time
+		print "OK: datapath time is %s" % exist_time
 		sys.exit(0)
 	else:
-		print "Error: datapath time is %s" % run_time
+		print "Error: datapath time is %s" % exist_time
 		sys.exit(2)
