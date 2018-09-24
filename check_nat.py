@@ -28,14 +28,14 @@ healthcheck = int(resdict['nat_gateway_bgp_healthcheck'])
 neighbour_down = int(resdict['nat_gateway_bgp_neighbour{state="down",neighbour_ip="XXX.XXX.XXX.XXX"}'])
 
 if invalid_clients > 0:
-	print ("Error: %s invalid containers found!" % invalid_clients)
-	sys.exit(2)
+  print ("Error: %s invalid containers found! Running containers %s, ppp_sessions %s." % (invalid_clients,running_clients,ppp_sessions))
+  sys.exit(2)
 if stopped_clients > 0:
-	print ("Error: %s stopped containers found!" % stopped_clients)
-	sys.exit(2)
+  print ("Error: %s stopped containers found! Running containers %s, ppp_sessions %s." % (invalid_clients,running_clients,ppp_sessions))
+  sys.exit(2)
 if running_clients != ppp_sessions:
-	print ("Error: Running containers is not same as ppp_sessions! Running containers is %s, ppp_sessions is %s" % (running_clients,ppp_sessions))
-	sys.exit(2)
+  print ("Error: Running containers is not same as ppp_sessions! Running containers %s, ppp_sessions %s" % (running_clients,ppp_sessions))
+  sys.exit(2)
 if healthcheck == 0:
 	print ("Error: bgp healthcheck failed!")
 	sys.exit(2)
