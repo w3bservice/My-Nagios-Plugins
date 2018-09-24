@@ -7,7 +7,7 @@ memcache_server="numown.docker.otw.net.au:8008"
 conn = memcache.Client([memcache_server])
 status = conn.get_stats()
 if status == []:
-	print ("%s connect failed!" % memcached_server)
+	print ("%s connect failed!" % memcache_server)
 	sys.exit(1)
 else:
 	datapath_timestamp = float(status[0][1]['datapath'])
