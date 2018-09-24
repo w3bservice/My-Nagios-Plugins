@@ -16,8 +16,8 @@ else:
 	exist_time = (str(datetime.datetime.now() - datapath_time)).split(".")[0]
 
 	if chk_time < datapath_time:
-		print "OK: datapath time is %s" % exist_time
+		print ("OK: datapath time is %s" % exist_time)
 		sys.exit(0)
 	else:
-		print "Error: datapath time is %s" % exist_time
+		print ("Error: datapath time is %s" % exist_time)
 		sys.exit(2)
