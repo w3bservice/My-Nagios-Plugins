@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# Need to grant replication client on *.* to 'chk_user'@'127.0.0.1'
 
 import mysql.connector,os,sys,getopt
 
@@ -42,12 +43,17 @@ def db_slave_test(warn,crit):
 		sys.exit(3)
 	
 	hostname = os.popen("/bin/hostname -f").read().strip('\n')
-	slave_sec = int(result['Seconds_Behind_Master'])
 	info_list = ('Master_Host:', str(result['Master_Host']),'Master_Log_File:', str(result['Master_Log_File']),\
 				'Read_Master_Log_Pos:',result['Read_Master_Log_Pos'],'Slave_IO_Running:', str(result['Slave_IO_Running']),\
 				'Slave_SQL_Running:',str(result['Slave_SQL_Running']),'Last_Errno:',result['Last_Errno'],\
 				'Seconds_Behind_Master:',result['Seconds_Behind_Master'])
 	
+	if result['Seconds_Behind_Master'] == None:
+		print ("Critical: %s MySQL Master-Slave status: Down " % hostname, info_list)
+		sys.exit(2)
+	else:
+		slave_sec = int(result['Seconds_Behind_Master'])
+
 	if result['Slave_IO_Running'] != 'Yes' or result['Slave_SQL_Running'] != 'Yes':
 		print ("Critical: %s MySQL Master-Slave status: Down " % hostname, info_list)
 		sys.exit(2)
