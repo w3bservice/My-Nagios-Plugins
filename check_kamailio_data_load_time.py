@@ -10,7 +10,7 @@ load_time = datetime.datetime.fromtimestamp(uload_time)
 chk_time = datetime.datetime.now() - datetime.timedelta(days=30)
 uchk_time = time.mktime(chk_time.timetuple())
 
-if uload_time == '':
+if data_load['result']['load_timestamp'] == '':
 	print ("Warning: Kamailio service is reloading, load time is empty.")
 	sys.exit(1)
 if uload_time < uchk_time:
