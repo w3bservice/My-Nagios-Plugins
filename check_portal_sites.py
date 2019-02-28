@@ -2,19 +2,20 @@
 # Check Portal Websites
 # Jack Su - PLAT-807
 
-import sys,urllib2
+import sys,urllib2,ssl
 
 portal_sites = ['https://portal.overthewire.com.au/login',
                 'https://staging-portal.overthewire.com.au/login',
                 'https://portal.faktortel.com.au/login',
                 'https://staging-portal.faktortel.com.au/login']
 
+gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
 broken_sites = []
 good_sites = []
 
 for i in range(0,len(portal_sites)):
 	try:
-		res = urllib2.urlopen(portal_sites[i])
+		res = urllib2.urlopen(portal_sites[i], context=gcontext)
 	except Exception,e:
 		print e
 		print ("%s connect failed!" % portal_sites[i])

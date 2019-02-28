@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
 # Check the list of puppet agents who had not talk to server more than 1 week
-# Jack Su - INFRA-642,PLAT-767
+# Jack Su - INFRA-642,PLAT-767,PLAT-1014
 
 import os,datetime,re
 
@@ -13,7 +13,7 @@ def get_ndays_ago(n):
 
 weekago = get_ndays_ago(7)
 
-base_dir = '/var/lib/puppet/reports'
+base_dir = "/var/lib/puppet/reports"
 dir_list = os.listdir(base_dir)
 
 dirlist = []
@@ -59,9 +59,13 @@ for i in range(0,len(nodes_list)):
 	if nodes_list[i] not in dir_list:
 		print ("No report %s" % nodes_list[i] ,file=wrtmp)
 
+err_rpt=os.popen('grep "^status: failed" /var/lib/puppet/reports/*/*.yaml | tr ":" "/" | cut -f 6 -d"/" | sort | uniq -c').read()
+print ("\nPuppet agent run failed count", file=wrtmp)
+print (err_rpt, file=wrtmp)
+
 wrtmp.close()
 
-mailto = "jack.su@overthewire.com.au, jason.bingham@overthewire.com.au, john.mizuno@overthewire.com.au"
+mailto = "team.platform@overthewire.com.au"
 os.popen('/usr/bin/mail -s "Weekly puppet agents check" ' + '%s < %s' % (mailto, tmpfile)) 
 
 #os.remove(tmpfile)
