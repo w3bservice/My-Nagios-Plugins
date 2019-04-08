@@ -41,10 +41,21 @@ def check_non_reg():
 	result = os.popen('sudo /usr/sbin/asterisk -rx "sip show registry" | grep -v ^Host | grep -v "\d* SIP registrations." | grep -v " Registered "')
 	res = result.read()
 	for line in res.splitlines():
-		count.append(line)
+		line = line.rstrip()
+		if "Auth. Sent" in line:
+			tmp, regtime = line.split('Auth. Sent',1)
+			if not regtime:
+				count.append(line)
+		elif "Request Sent" in line:
+			tmp, regtime = line.split('Request Sent',1)
+			if not regtime:
+				count.append(line)
+		else:
+			count.append(line)
 
 	if len(count) != 0:
 		print ("Error: %s Unregistered connection found!" % len(count))
+		print ("\n%s" % res)
 		sys.exit(1)
 	else:
 		print ("OK: No Unregistered connection found.")
@@ -55,10 +66,21 @@ def check_non_reg_iax2():
 	result = os.popen('sudo /usr/sbin/asterisk -rx "iax2 show registry" | grep -v ^Host | grep -v "\d* IAX2 registrations." | grep -v " Registered"')
 	res = result.read()
 	for line in res.splitlines():
-		count.append(line)
+		line = line.rstrip()
+		if "Auth. Sent" in line:
+			tmp, regtime = line.split('Auth. Sent',1)
+			if not regtime:
+				count.append(line)
+		elif "Request Sent" in line:
+			tmp, regtime = line.split('Request Sent',1)
+			if not regtime:
+				count.append(line)
+		else:
+			count.append(line)
 
 	if len(count) != 0:
 		print ("Error: %s Unregistered IAX2 connection found!" % len(count))
+		print ("\n%s" % res)
 		sys.exit(1)
 	else:
 		print ("OK: No Unregistered IAX2 connection found.")
@@ -70,9 +92,9 @@ def main():
 	long_args = ["help","check=","warning=","critical="]
 
 	try:
-   		options, args = getopt.getopt(sys.argv[1:], short_args, long_args)
+   	options, args = getopt.getopt(sys.argv[1:], short_args, long_args)
 	except getopt.GetoptError:
-    		usage()
+   	usage()
 		sys.exit(3)
 
 	warn_val = 0
