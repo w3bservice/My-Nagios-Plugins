@@ -92,10 +92,10 @@ def main():
 	long_args = ["help","check=","warning=","critical="]
 
 	try:
-   	options, args = getopt.getopt(sys.argv[1:], short_args, long_args)
+			options, args = getopt.getopt(sys.argv[1:], short_args, long_args)
 	except getopt.GetoptError:
-   	usage()
-		sys.exit(3)
+			usage()
+			sys.exit(3)
 
 	warn_val = 0
 	crit_val = 0
