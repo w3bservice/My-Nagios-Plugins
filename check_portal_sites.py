@@ -9,7 +9,8 @@ portal_sites = ['https://portal.overthewire.com.au/login',
                 'https://portal.faktortel.com.au/login',
                 'https://staging-portal.faktortel.com.au/login']
 
-gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+#gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+gcontext = ssl.create_default_context()
 broken_sites = []
 good_sites = []
 
